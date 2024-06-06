@@ -1,46 +1,42 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/logo";
+import { useRouter } from "next/navigation";
 
 export function LandingPage() {
+  const router = useRouter();
+
+  const onStartClicked = () => {
+    router.push("/chat")
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 min-h-[100dvh]">
-      <div className="flex flex-col items-center justify-center px-4 md:px-6 py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+    <div className="flex flex-col min-h-screen bg-background justify-end">
+      <main className="flex flex-col md:flex-row items-center justify-center px-4 md:px-6 py-12 md:py-24 lg:py-32 flex-grow">
         <div className="max-w-xl text-center space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-orange-900 dark:bg-orange-900 dark:text-orange-100">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary-background px-3 py-1">
             <Logo />
           </div>
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+          <h1 className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl">
             Connect with New People
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 md:text-xl">
+          <p className="text-foreground/50 md:text-xl">
             Start chatting with strangers from around the world. Make new
             friends and have fun!
           </p>
-          <Button
-            className="bg-primary w-full max-w-[240px] text-white hover:bg- focus:ring-"
-            color="orange"
-            variant="primary">
-            Start Chatting
+          <Button className="w-full max-w-[240px] bg-primary text-lg text-white hover:bg-primary/80 focus:ring-primary/30"
+            onClick={onStartClicked}
+          >
+            Start
           </Button>
         </div>
+      </main>
+    <footer className="w-full border-t border-gray-200 py-2 text-sm text-muted-foreground  col-span-1 md:col-span-2">
+      <div className="container flex justify-center items-center">
+        <p className="text-center">© 2024 Holameet. All rights reserved.</p>
       </div>
-      <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-        <img
-          alt="Image"
-          className="rounded-full"
-          src="/placeholder.svg"
-          style={{
-            width: "350px",
-            height: "350px",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-      <footer className="w-full border-t border-gray-200 pt-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
-        <div className="container flex justify-center">
-          <p className="text-center">© 2024 Holameet. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+    </footer>
+    </div >
   );
 }
