@@ -7,14 +7,14 @@ export default function Logo() {
     return (
       <div className="flex items-center gap-4">
         <div className="relative w-12 h-12">
-          <div className="absolute top-0 left-0 w-8 h-8 bg-[#ff9100] rounded-full flex items-center justify-center text-white">
+          <div className="absolute top-0 left-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
             <VideoIcon className="w-5 h-5" />
           </div>
-          <div className="absolute bottom-0 right-0 w-8 h-8 bg-[#ff9100] rounded-full flex items-center justify-center text-white">
+          <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
             <VideoIcon className="w-5 h-5" />
           </div>
         </div>
-        <div className="text-2xl font-bold text-[#ff9100]">HolaMeet</div>
+        <div className="text-2xl font-bold text-primary">HolaMeet</div>
       </div>
     )
   }

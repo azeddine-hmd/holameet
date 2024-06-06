@@ -31,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, libre_franklin.variable, chivo.variable)}>{children}</body>
+      <body className={cn(inter.className, libre_franklin.variable, chivo.variable, "bg-backgroundw text-foregroud min-h-screen")}>
+        {children}
+      </body>
     </html>
   );
 }
