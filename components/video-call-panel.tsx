@@ -27,8 +27,8 @@ export default function VideoCallPanel() {
             }}
           >
             <div className="flex h-full items-center gap-4">
-              <VideoCallCard className="rounded-md border border-border w-[400px]" />
-              <div className="flex justify-center items-center h-full flex-shrink-0 space-x-2 max-w-5">
+              <VideoCallCard className="rounded-md border border-border w-[200px]" />
+              <div className="flex justify-center items-center h-full space-x-2 max-w-5">
                 <Button className="rounded-full bg-secondary text-secondary-foreground w-16 h-16 outline-none">
                   <BsMic size="32" />
                 </Button>
