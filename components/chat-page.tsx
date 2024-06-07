@@ -6,7 +6,7 @@ export default function ChatPage() {
   return (
     <main className="w-full h-full flex">
       <VideoCallPanel />
-      <div className="w-[500px]">chat div</div>
+      <div className="w-[200px]">chat div</div>
     </main>
   );
 }

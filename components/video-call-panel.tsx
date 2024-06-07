@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Logo from "./logo";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -20,15 +19,15 @@ export default function VideoCallPanel() {
           <PopoverTrigger>
             <div className="hidden"></div>
           </PopoverTrigger>
-          <PopoverContent className="right-0 left-0 p-0 m-8 box-border h-40 bg-transparent outline-0  shadow-none border-0"
+          <PopoverContent className="right-0 left-0 p-0 m-4 mb-8 box-border h-40 bg-transparent outline-0  shadow-none border-0"
             sideOffset={0}
             style={{
               width: width! - 64,
             }}
           >
-            <div className="flex h-full items-center gap-4">
-              <VideoCallCard className="rounded-md border border-border w-[200px]" />
-              <div className="flex justify-center items-center h-full space-x-2 max-w-5">
+            <div className="flex h-full items-center gap-4 overflow-hidden">
+              <VideoCallCard className="rounded-md border border-border flex-shrink-0 w-[300px]" />
+              <div className="flex justify-center items-center h-full flex-grow space-x-2">
                 <Button className="rounded-full bg-secondary text-secondary-foreground w-16 h-16 outline-none">
                   <BsMic size="32" />
                 </Button>
