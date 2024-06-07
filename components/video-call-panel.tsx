@@ -40,7 +40,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
             }}
           >
             <div className="flex h-full gap-4">
-              <VideoCallCard className="rounded-md border border-border flex-shrink-0 w-[300px]" />
+              <VideoCallCard className="rounded-md border-2 border-border flex-shrink-0 w-[300px]" />
               <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
                 <div className="flex justify-center items-center h-full space-x-2">
 
