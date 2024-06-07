@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import MessageList from '@/components/chatBox/MessageList';
 import MessageInput from '@/components/chatBox/MessageInput';
+import { cn } from '@/lib/utils';
 
-const ChatBox = () => {
+export type ChatBoxProps = React.ComponentProps<"div">;
+
+function ChatBox({ className, ...restProps }: ChatBoxProps) {
   const [messages, setMessages] = useState([
     { text: "Hey there! How's it going?", sender: 'JD', time: '10:30 AM' },
     { text: "I'm doing great, thanks for asking!", sender: 'YO', time: '10:31 AM' },
@@ -17,7 +20,7 @@ const ChatBox = () => {
   };
 
   return (
-    <div className="flex flex-col h-[600px] w-[400px] bg-white dark:bg-gray-950 rounded-2xl shadow-lg overflow-hidden">
+    <div className={cn("flex flex-col h-full w-full bg-white dark:bg-gray-950 rounded-2xl shadow-lg overflow-hidden", className)} {...restProps}>
       <MessageList messages={messages} />
       <MessageInput onSend={handleSend} />
     </div>
