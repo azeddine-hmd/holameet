@@ -1,9 +1,12 @@
 "use client";
 
+import VideoCallPanel from "./video-call-panel";
+
 export default function ChatPage() {
   return (
-    <main>
-      <VideoCallCard>
+    <main className="w-full h-full flex">
+      <VideoCallPanel />
+      <div className="w-[500px]">chat div</div>
     </main>
   );
 }

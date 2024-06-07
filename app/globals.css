@@ -55,6 +55,10 @@
     @apply border-border;
   }
 
+  html {
+    @apply h-full m-0 p-0
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -71,4 +75,8 @@
   h6 {
     font-family: var(--font-libre_franklin), sans-serif;
   }
+}
+
+[data-radix-popper-content-wrapper] {
+  width: fit-content;
 }
