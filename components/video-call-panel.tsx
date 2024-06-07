@@ -46,9 +46,9 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
 
                   <Button className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setMicMute(!isMicMute)}>
-                    <BsMic size="24" className="absolute left-50 top-50" />
+                    <BsMic size="24" className={cn("absolute left-50 top-50", {"text-destructive": isMicMute})} />
                     {isMicMute &&
-                      <span className="absolute w-[40px] h-1 bg-red-500 z-50 rotate-[140deg]"></span>
+                      <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
                     }
                   </Button>
                   <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 hover:text-white bg-white/20 hover:bg-white/30 text-white">
@@ -58,9 +58,9 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
                     </span>
                   </Button>
                   <Button className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setHeadsetMute(!isHeadsetMute)}>
-                    <BsHeadset size="24" className="absolute left-50 top-50" />
+                    <BsHeadset size="24" className={cn("absolute left-50 top-50", {"text-destructive": isHeadsetMute})} />
                     {isHeadsetMute &&
-                      <span className="absolute w-[20px] h-1 bg-red-500 z-50 rotate-[140deg]"></span>
+                      <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
                     }
                   </Button>
                 </div>
