@@ -8,6 +8,7 @@ import VideoCallCard from "./video-call-card";
 import { BsHeadset, BsMic } from "react-icons/bs";
 import useResizeObserver from "use-resize-observer";
 import { useState } from "react";
+import SkipIcon from '@/components/icons/SkipIcon';
 
 export type VideoCallPanel = React.ComponentProps<"div">;
 
@@ -34,19 +35,22 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
             <div className="flex h-full gap-4">
               <VideoCallCard className="rounded-md border border-border flex-shrink-0 w-[300px]" />
               <div className="flex justify-center items-center h-full flex-grow space-x-2">
-                <Button className="relative rounded-full bg-black/70 border-2 border-white/50 shadow-lg backdrop-blur-lg text-white w-16 h-16 outline-none hover:bg-inherit" onClick={() => setMicMute(!isMicMute)}>
-                  <BsMic size="32" className="absolute left-50 top-50" />
+                <Button size="icon" variant="ghost" className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setMicMute(!isMicMute)}>
+                  <BsMic size="24" className="absolute left-50 top-50" />
                   {isMicMute &&  
                     <span className="absolute w-[40px] h-1 bg-red-500 z-50 rotate-[120deg]"></span>
                   }
                 </Button>
-                <Button className="h-16 w-32 px-4 text-xl hover:bg-inherit border-2 border-white/50 bg-primary backdrop-blur-lg text-white rounded-3xl outline-none">
-                  {/* SKIP */}
+                <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 bg-white/20 hover:bg-white/30 text-white">
+                  <SkipIcon />
+                  <span className="ml-1 bold">
+                    SKIP
+                  </span>
                 </Button>
-                <Button className="relative rounded-full hover:bg-inherit bg-black/70 border-2 border-white/50 shadow-lg backdrop-blur-lg text-white w-16 h-16 outline-none" onClick={() => setHeadsetMute(!isHeadsetMute)}>
-                  <BsHeadset size="32" className="absolute left-50 top-50" />
+                <Button size="icon" variant="ghost" className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setHeadsetMute(!isHeadsetMute)}>
+                  <BsHeadset size="24" className="absolute left-50 top-50" />
                   {isHeadsetMute &&  
-                    <span className="absolute w-[40px] h-1 bg-red-500 z-50 rotate-[120deg]"></span>
+                    <span className="absolute w-[20px] h-1 bg-red-500 z-50 rotate-[120deg]"></span>
                   }
                 </Button>
               </div>
