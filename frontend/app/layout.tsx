@@ -4,6 +4,7 @@ import "./globals.css";
 import { Libre_Franklin } from 'next/font/google'
 import { Chivo } from 'next/font/google'
 import { cn } from "@/lib/utils";
+import GlobalTemplate from "@/components/global-template";
 
 const libre_franklin = Libre_Franklin({
   subsets: ['latin'],
@@ -32,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, libre_franklin.variable, chivo.variable, "bg-backgroundw text-foregroud h-full")}>
-        {children}
+        <GlobalTemplate>
+          {children}
+        </GlobalTemplate>
       </body>
     </html>
   );
