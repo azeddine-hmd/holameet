@@ -8,6 +8,7 @@ export function LandingPage() {
   const router = useRouter();
 
   const onStartClicked = () => {
+    window.socket.emit("start");
     router.push("/chat")
   };
 
