@@ -18,6 +18,10 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const [isHeadsetMute, setHeadsetMute] = useState(false);
   const [hideCallControl, setHideCallControl] = useState(false);
 
+  const skipSession = () => {
+    window.socket.emit("skip");
+  };
+
   return (
     <div
       ref={ref}
@@ -51,7 +55,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
                       <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
                     }
                   </Button>
-                  <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 hover:text-white bg-white/20 hover:bg-white/30 text-white">
+                  <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 hover:text-white bg-white/20 hover:bg-white/30 text-white" onClick={() => skipSession()}>
                     <SkipIcon />
                     <span className="ml-1 bold">
                       SKIP
