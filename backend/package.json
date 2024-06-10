@@ -5,11 +5,11 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "NODE_ENV=production node dist/index.js",
-    "dev": "NODE_ENV=development DEBUG=express:* DEBUG_COLORS=true  npm-run-all -p watch:ts start:dev",
+    "start": "node dist/index.js",
+    "dev": "npm-run-all -p watch:ts start:dev",
     "watch:ts": "tsc --watch",
     "start:dev": "node --inspect=0.0.0.0 --watch dist/index.js",
-    "test": "NODE_ENV=test jest"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",

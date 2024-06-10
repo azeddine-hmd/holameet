@@ -9,18 +9,8 @@ export function LandingPage() {
   const router = useRouter();
 
   const onStartClicked = () => {
-    window.socket.emit("start");
+    router.push('/chat')
   };
-
-  useEffect(() => {
-    document.addEventListener("socket is ready", () => {
-      window.socket.on("session started", (...args: any[]) => {
-        console.log("[SOCKET]:", args[0]);
-        router.push("/chat");
-      })
-    });
-  // eslint-disable-next-line
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-background justify-end">
