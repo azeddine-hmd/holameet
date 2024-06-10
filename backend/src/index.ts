@@ -41,11 +41,11 @@ io.on("connection", (socket: Socket) => {
       return;
     }
     if (q1 != null) {
-      const [socket1, socket2] = getSessionSockets(socket.id, q1);
+      const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q1 });
       startSession(socket1, socket2);
       q1 = null;
     } else if (q2 != null) {
-      const [socket1, socket2] = getSessionSockets(socket.id, q2);
+      const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q2});
       startSession(socket1, socket2);
       q2 = null;
     } else {
@@ -61,7 +61,7 @@ io.on("connection", (socket: Socket) => {
 	assert(session != null);
     // finding session for person who fires skip event
     if (q1 != null) {
-      const [socket1, socket2] = getSessionSockets(session!.id1, q1);
+      const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1});
       startSession(socket1, socket2);
       q1 = null;
     } else {
@@ -71,7 +71,7 @@ io.on("connection", (socket: Socket) => {
 
     // finding session for other person who been skiped on
     if (q2 != null) {
-      const [socket1, socket2] = getSessionSockets(session!.id2, q2);
+      const [socket1, socket2] = getSessionSockets({ id1: session!.id2, id2: q2 });
       startSession(socket1, socket2);
       q2 = null;
     } else {
@@ -84,8 +84,25 @@ io.on("connection", (socket: Socket) => {
     console.info("[EVENT]: a user disconnected, socket.id:", socket.id);
     if (q1 === socket.id) q1 = null;
     if (q2 === socket.id) q2 = null;
-	removeSession(socket.id);
-	socket.emit('stop session');
+    const session = removeSession(socket.id);
+    if (session) {
+      let otherSocket: Socket | null = null;
+      if (socket.id === session.id1) {
+        io.sockets.sockets.forEach((s) => { 
+          otherSocket = s;
+          return s.id === session.id2;
+        });
+        if (otherSocket)
+          otherSocket.emit('stop session');
+      } else if (socket.id === session.id2) {
+        io.sockets.sockets.forEach((s) => { 
+          otherSocket = s;
+          return s.id === session.id1;
+        });
+        if (otherSocket)
+          otherSocket.emit('stop session');
+      }    
+    }
   });
 });
 
@@ -103,13 +120,13 @@ function removeSession(socketId: string): Session | null {
   return session;
 }
 
-function getSessionSockets(id1: string, id2: string): [Socket, Socket] {
+function getSessionSockets(session: Session): [Socket, Socket] {
   const result: [Socket | null, Socket | null] = [null, null];
   io.sockets.sockets.forEach((s) => {
-    if (s.id === id1) result[0] = s;
-    else if (s.id === id2) result[1] = s;
+    if (s.id === session.id1) result[0] = s;
+    else if (s.id === session.id2) result[1] = s;
   });
-  assert(result[0] != null || result[1] != null);
+  assert(result[0] != null && result[1] != null);
   return [result[0]!, result[1]!];
 }
 

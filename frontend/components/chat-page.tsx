@@ -5,9 +5,6 @@ import VideoCallPanel from "./video-call-panel";
 import { useEffect } from "react";
 
 export default function ChatPage() {
-
-  
-
   useEffect(() => {
     const onSocketReady = () => {
       window.socket.emit("start");
