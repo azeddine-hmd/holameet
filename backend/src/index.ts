@@ -1,14 +1,18 @@
 import express from "express";
 import dotenv from "dotenv";
-import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
 import { assert } from "console";
+import https from "https";
+import fs from "fs";
 
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer({ 
+  key: fs.readFileSync('cert.key'),
+  cert: fs.readFileSync('cert.crt')
+}, app);
 
 const corsOpts: cors.CorsOptions = {
   origin: "*",
@@ -21,6 +25,7 @@ app.use(cors(corsOpts));
 const io = new Server(server, {
   cors: corsOpts,
 });
+
 
 interface Session {
   id1: string;
@@ -45,7 +50,7 @@ io.on("connection", (socket: Socket) => {
       startSession(socket1, socket2);
       q1 = null;
     } else if (q2 != null) {
-      const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q2});
+      const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q2 });
       startSession(socket1, socket2);
       q2 = null;
     } else {
@@ -57,11 +62,11 @@ io.on("connection", (socket: Socket) => {
   socket.on("skip", () => {
     console.info("[EVENT]: fired `skip` event by id:", socket.id);
 
-	const session = removeSession(socket.id);
-	assert(session != null);
+    const session = removeSession(socket.id);
+    assert(session != null);
     // finding session for person who fires skip event
     if (q1 != null) {
-      const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1});
+      const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1 });
       startSession(socket1, socket2);
       q1 = null;
     } else {
@@ -88,20 +93,21 @@ io.on("connection", (socket: Socket) => {
     if (session) {
       let otherSocket: Socket | null = null;
       if (socket.id === session.id1) {
-        io.sockets.sockets.forEach((s) => { 
+        io.sockets.sockets.forEach((s) => {
           otherSocket = s;
           return s.id === session.id2;
         });
-        if (otherSocket)
-          otherSocket.emit('stop session');
+        if (otherSocket) {
+          (otherSocket as Socket).emit('stop session');
+        }
       } else if (socket.id === session.id2) {
-        io.sockets.sockets.forEach((s) => { 
+        io.sockets.sockets.forEach((s) => {
           otherSocket = s;
           return s.id === session.id1;
         });
         if (otherSocket)
-          otherSocket.emit('stop session');
-      }    
+          (otherSocket as Socket).emit('stop session');
+      }
     }
   });
 });
@@ -141,5 +147,5 @@ function startSession(socket1: Socket, socket2: Socket) {
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.info(`[server]: server is running at http://localhost:${port}`);
+  console.info(`[server]: server is running at https://localhost:${port}`);
 });

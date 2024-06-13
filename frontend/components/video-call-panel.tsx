@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import VideoCallCard from "./video-call-card";
 import { BsHeadset, BsMic } from "react-icons/bs";
 import useResizeObserver from "use-resize-observer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SkipIcon from '@/components/icons/SkipIcon';
 
 export type VideoCallPanel = React.ComponentProps<"div">;
@@ -17,10 +17,27 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const [isMicMute, setMicMute] = useState(false);
   const [isHeadsetMute, setHeadsetMute] = useState(false);
   const [hideCallControl, setHideCallControl] = useState(false);
+  const [stream, setStream] = useState<MediaStream>(null);
 
   const skipSession = () => {
     window.socket.emit("skip");
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        setTimeout(() => setStream(stream), 2_000);
+        // setStream(stream);
+      } catch (error) {
+        console.error(error);
+        alert("user rejected permission to media devices");
+      }
+    })();
+  }, []);
 
   return (
     <div
@@ -37,14 +54,14 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
           <PopoverTrigger>
             <div className="hidden"></div>
           </PopoverTrigger>
-          <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-40 bg-transparent outline-0  shadow-none border-0 overflow-hidden"
+          <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0 overflow-hidden"
             sideOffset={0}
             style={{
               width: width!,
             }}
           >
-            <div className="flex h-full gap-4">
-              <VideoCallCard className="rounded-md border-2 border-border flex-shrink-0 w-[300px]" />
+            <div className="flex h-full gap-4 items-end">
+              <VideoCallCard wrapperClassName="rounded-md border-2 border-border flex-shrink-0 w-[300px] min-h-[200px]" stream={stream} micMute={isMicMute} muted={isHeadsetMute} />
               <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
                 <div className="flex justify-center items-center h-full space-x-2">
 
