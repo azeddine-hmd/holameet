@@ -63,7 +63,11 @@ io.on("connection", (socket: Socket) => {
     console.info("[EVENT]: fired `skip` event by id:", socket.id);
 
     const session = removeSession(socket.id);
-    assert(session != null);
+    // assert(session != null);
+    if (!session) {
+      console.log("You're not in session for a skip. ignoring...");
+      return;
+    }
     // finding session for person who fires skip event
     if (q1 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1 });
