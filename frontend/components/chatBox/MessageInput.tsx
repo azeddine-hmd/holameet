@@ -21,15 +21,14 @@ function MessageInput({ onSend }: { onSend: (text: string) => void }) {
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => { setText(e.target.value) }}
         onKeyDown={(e) => {
           console.log("key:", e.key);
-          if (e.key === "Enter" && text.trim() !== "") {
+          if (!e.shiftKey && e.key === "Enter" && text.trim() !== "") {
             e.preventDefault();
             sendMessage();
           } else if (e.shiftKey && e.key === "Enter") {
             e.preventDefault();
+            console.log("Shift + Enter condition");
             setText(text + "\n");
-          } else if (e.key === "Enter") {
-            e.preventDefault();
-          }
+          } 
         }}
         onKeyUp={(e) => {
 
