@@ -6,20 +6,25 @@ import { useEffect } from "react";
 import { callPeer } from "../config/webrtc";
 
 export default function ChatPage() {
-  const onSessionStarted = () => {
-    // callPeer();
+  const onSessionStarted = (...args: any[]) => {
+    console.log("session started!", ...args);
+    // TODO: invoke callPeer() function
+  };
+
+  const onSessionStopped = (...args: any[]) => {
+    console.log("session stopped!", ...args);
+    // TODO: close remote peer connection
+    window.socket.emit("start");
   };
 
   useEffect(() => {
     const onSocketReady = () => {
       window.socket.emit("start");
       window.socket.on("session started", (...args: any[]) => {
-        console.log("[SOCKET]:", args[0]);
-        callPeer();
+        onSessionStarted(...args);
       })
-      window.socket.on("stop session", () => {
-        console.log("[SOCKET]: Session stopped");
-        window.socket.emit("start");
+      window.socket.on("stop session", (...args: any[]) => {
+        onSessionStopped(...args);
       });
     };
     if (window.socket != null) {
@@ -34,6 +39,7 @@ export default function ChatPage() {
 
   useEffect(() => {
   }, []);
+
 
   return (
     <main className="w-full h-full flex">

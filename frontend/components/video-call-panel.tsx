@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import SkipIcon from '@/components/icons/SkipIcon';
 import { useDrag, useGesture } from '@use-gesture/react';
 import { animated, useSpring } from "@react-spring/web";
+import { startLocalStream } from "@/config/webrtc";
 
 export type VideoCallPanel = React.ComponentProps<"div">;
 
@@ -19,8 +20,9 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const [isMicMute, setMicMute] = useState(false);
   const [isHeadsetMute, setHeadsetMute] = useState(false);
   const [hideCallControl, setHideCallControl] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const [isControlsOpen, setControlsOpen] = useState(false);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
   const skipSession = () => {
     window.socket.emit("skip");
@@ -28,19 +30,8 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
   useEffect(() => {
     setControlsOpen(true);
-    (async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-        setTimeout(() => setStream(stream), 2_000);
-        // setStream(stream);
-      } catch (error) {
-        console.error(error);
-        alert("user rejected permission to media devices");
-      }
-    })();
+    startLocalStream().then(stream => setLocalStream(stream));
+    startLocalStream().then(stream => setRemoteStream(stream));
   }, []);
 
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
@@ -64,7 +55,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
       onMouseLeave={() => setHideCallControl(true)}
       {...restProps}
     >
-      <VideoCallCard />
+      <VideoCallCard stream={remoteStream} />
       <Logo className="absolute left-4 top-4" />
       <div className="absolute bottom-0 left-0 h-0 w-0">
         <Popover open={isControlsOpen}>
@@ -80,7 +71,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
             <div className="flex h-full gap-4 items-end">
 
               <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
-                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={stream} {...bind()} />
+                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={localStream} {...bind()} />
               </animated.div>
 
               <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
