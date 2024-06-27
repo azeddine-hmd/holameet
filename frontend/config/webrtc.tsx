@@ -1,4 +1,4 @@
-export const peerConfig = {
+const peerConfig = {
   iceServers: [
     {
       urls: [
@@ -13,12 +13,9 @@ export async function callPeer() {
   await fetchUserMedia();
 }
 
-export async function fetchUserMedia() {
-    // ask for media permission from browser
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-      console.log("received stream:", stream);
-    }).catch(error => {
-      console.error(error);
-      alert("why did you reject permission to your media? you dumb bitch user");
-    })
+export async function createPeerConnection(offerObj: any): MediaStream {
+  peerConnection = await new RTCPeerConnection(peerConfig);
+  remoteStream = new MediaStream();
+
+  return remoteStream;
 }

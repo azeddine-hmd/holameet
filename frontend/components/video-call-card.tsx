@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export type VideoCallCard = {
   wrapperClassName?: string;
-  stream?: MediaStream;
+  stream?: MediaStream | null;
   micMute?: boolean;
 } & React.ComponentProps<"video">;
 
@@ -17,11 +17,11 @@ export default function VideoCallCard({
   micMute = false,
   ...restProps 
 }: VideoCallCard) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioTrackRef = useRef<MediaStreamTrack>(null);
+  const videoRef = useRef<HTMLVideoElement| null>(null);
+  const audioTrackRef = useRef<MediaStreamTrack | null>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
       audioTrackRef.current = stream?.getAudioTracks()[0];
     }
