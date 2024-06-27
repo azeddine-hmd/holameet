@@ -80,7 +80,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
             <div className="flex h-full gap-4 items-end">
 
               <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
-                <VideoCallCard wrapperClassName="w-[300px] min-h-[200px] rounded-md border-2 border-border" stream={stream} {...bind()} />
+                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={stream} {...bind()} />
               </animated.div>
 
               <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
