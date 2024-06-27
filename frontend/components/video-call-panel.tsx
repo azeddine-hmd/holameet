@@ -71,7 +71,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
           <PopoverTrigger>
             <div className="hidden"></div>
           </PopoverTrigger>
-          <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0 overflow-hidden"
+          <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0"
             sideOffset={0}
             style={{
               width: width!,
