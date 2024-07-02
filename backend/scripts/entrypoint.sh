@@ -2,7 +2,7 @@
 
 if [ "$NODE_ENV" == "production" ]; then
 	npm run build
-	npm run start2
+	npm run start
 else
 	npm run dev2
 fi
