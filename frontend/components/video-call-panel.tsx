@@ -9,9 +9,9 @@ import { BsHeadset, BsMic } from "react-icons/bs";
 import useResizeObserver from "use-resize-observer";
 import { useState, useEffect } from "react";
 import SkipIcon from '@/components/icons/SkipIcon';
-import { useDrag, useGesture } from '@use-gesture/react';
+import { useDrag } from '@use-gesture/react';
 import { animated, useSpring } from "@react-spring/web";
-import { startLocalStream } from "@/config/webrtc";
+import * as Rtc from "@/config/webrtc";
 
 export type VideoCallPanel = React.ComponentProps<"div">;
 
@@ -26,24 +26,84 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
   const skipSession = () => {
     window.socket.emit("skip");
+    Rtc.setRemoteStream(null);
+    Rtc.setPeerConnection(null);
+    setRemoteStream(null);
   };
 
   useEffect(() => {
     setControlsOpen(true);
-    startLocalStream().then(stream => setLocalStream(stream));
-    startLocalStream().then(stream => setRemoteStream(stream));
+    Rtc.startLocalStream().then(() => setLocalStream(Rtc.localStream));
+  }, []);
+
+  const onSessionStarted = (...args: any[]) => {
+    console.log("session started!", ...args);
+    setTimeout(() => {
+      Rtc.intiiateCall().then(() => {
+        setLocalStream(Rtc.localStream);
+        setRemoteStream(Rtc.remoteStream);
+      });
+    }, 1_000);
+  };
+
+  const onSessionStopped = (...args: any[]) => {
+    console.log("session stopped!", ...args);
+    setTimeout(() => window.socket.emit("start"), 1_000);
+    Rtc.setRemoteStream(null);
+    setRemoteStream(null);
+  };
+
+  const onNewOfferAwaiting = (...args: any[]) => {
+    const offerObj = args[0];
+    console.log("[SOCKET]: recieveing offer...", offerObj);
+    Rtc.answerOffer(offerObj).then(() => {
+      setRemoteStream(Rtc.remoteStream);
+    });
+  };
+
+  const onAnswerResponse = (...args: any[]) => {
+    const answer = args[0];
+    console.log("[SOCKET]: answer response...", answer);
+    Rtc.addAnswer(answer); 
+  };
+
+  const onRecieveIceCandidate = (...args: any[]) => {
+    const iceCandidate: RTCIceCandidate = args[0];
+    Rtc.addNewIceCandidate(iceCandidate);
+  };
+
+  useEffect(() => {
+    const onSocketReady = () => {
+      window.socket.emit("start");
+      window.socket.on("session started", (...args: any[]) => {
+        onSessionStarted(...args);
+      })
+      window.socket.on("stop session", (...args: any[]) => {
+        onSessionStopped(...args);
+      });
+      window.socket.on("newOfferAwaiting", (...args: any[]) => {
+        onNewOfferAwaiting(...args);
+      })
+      window.socket.on("answerResponse", (...args: any[]) => {
+        onAnswerResponse(...args);
+      });
+      window.socket.on("receive icecandidate", (...args: any[]) => {
+        onRecieveIceCandidate(...args);
+      });
+    };
+    if (window.socket != null) {
+      onSocketReady();
+    } else {
+      document.addEventListener("socket is ready", () => {
+        onSocketReady();
+      });
+    }
+    // eslint-disable-next-line
   }, []);
 
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(({ down, movement: [mx, my], xy, axis, values}) => {
-    console.log("onDrag called");
-    console.log("state.xy", xy);
-    console.log("state.axis", axis);
-    console.log("movement mx:", mx);
-    console.log("movement my:", my);
-    console.log("state.values", values);
-    console.log("\n");
     api.start({ x: down ? mx : 0, y: down ? my : 0, immediate: down });
   });
 
