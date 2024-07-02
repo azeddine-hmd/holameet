@@ -10,8 +10,8 @@ dotenv.config();
 
 const app = express();
 const server = https.createServer({ 
-  key: fs.readFileSync('cert.key'),
-  cert: fs.readFileSync('cert.crt')
+  key: process.env.NODE_ENV === "development" ? fs.readFileSync('cert.key') : undefined,
+  cert: process.env.NODE_ENV === "development" ? fs.readFileSync('cert.crt'): undefined,
 }, app);
 
 const corsOpts: cors.CorsOptions = {
@@ -26,7 +26,7 @@ const io = new Server(server, {
   cors: corsOpts,
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || "3000";
 server.listen(port, () => {
   console.info(`[server]: server is running at https://localhost:${port}`);
 });
@@ -79,6 +79,11 @@ io.on('connection', (socket: Socket) => {
       console.log('You\'re not in session for a skip. ignoring...');
       return;
     }
+    const [_, socket2] = getSessionSockets(session);
+    if (session.id1 === socket.id) {
+      socket2?.emit("stop session");
+    }
+
     // finding session for person who fires skip event
     if (q1 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1 });
@@ -167,8 +172,8 @@ io.on('connection', (socket: Socket) => {
     socket1.emit('answerResponse', newAnswer);
 
     // send ice candidates to both clients 
-    socket1.emit('receive icecandidate', session.rtcInfo?.answererIceCandidates);
-    socket2.emit('receive icecandidate', session.rtcInfo?.offererIceCandidates);
+    // socket1.emit('receive icecandidate', session.rtcInfo?.answererIceCandidates);
+    // socket2.emit('receive icecandidate', session.rtcInfo?.offererIceCandidates);
   })
 
   socket.on('send icecandidate', (...args: any[]) => {
@@ -188,12 +193,12 @@ io.on('connection', (socket: Socket) => {
       // we are offerer
       assert(session.rtcInfo != undefined);
       session.rtcInfo?.offererIceCandidates.push(iceCandidate);
-      // socket2.emit("receive icecandidate", iceCandidate);
+      socket2.emit("receive icecandidate", iceCandidate);
     } else {
       // we are answerer
       assert(session.rtcInfo != undefined);
       session.rtcInfo?.answererIceCandidates.push(iceCandidate);
-      // socket1.emit("receive icecandidate", iceCandidate);
+      socket1.emit("receive icecandidate", iceCandidate);
     }
   })
 

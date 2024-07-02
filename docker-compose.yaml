@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+
+  backend:
+    image: holameet-backend
+    container_name: holameet-backend
+    build: ./backend
+    user: root
+    ports:
+      - 3003:3003
+      - 9229:9229
+    # volumes:
+    #   - ./backend:/usr/src/app
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - BACKEND_PROTOCOL=${BACKEND_PROTOCOL}
+      - BACKEND_HOST=${BACKEND_HOST}
+      - BACKEND_DOMAIN=${BACKEND_DOMAIN}
+      - FRONTEND_PROTOCOL=${FRONTEND_PROTOCOL}
+      - FRONTEND_HOST=${FRONTEND_HOST}
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    image: holameet-frontend
+    container_name: holameet-frontend
+    build: ./frontend
+    user: root
+    ports:
+      - 3002:3002
+    volumes:
+      - ./frontend:/usr/src/app
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - BACKEND_PROTOCOL=${BACKEND_PROTOCOL}
+      - BACKEND_HOST=${BACKEND_HOST}
+      - BACKEND_DOMAIN=${BACKEND_DOMAIN}
+      - FRONTEND_PROTOCOL=${FRONTEND_PROTOCOL}
+      - FRONTEND_HOST=${FRONTEND_HOST}
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}

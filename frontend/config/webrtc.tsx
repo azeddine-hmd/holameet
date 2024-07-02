@@ -1,12 +1,13 @@
 export let localStream: MediaStream | null = null;
 export let remoteStream: MediaStream | null = null;
 let peerConnection: RTCPeerConnection | null = null;
+let isRemoteDescSet = false;
 
 export async function startLocalStream() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: false,
+      audio: true,
     });
     localStream = stream;
   } catch (error) {
@@ -20,7 +21,7 @@ export async function intiiateCall() {
   // creating offer item
   try {
     console.log("creating offer...");
-    const offer = await peerConnection!.createOffer();
+    const offer = await peerConnection!.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
     console.log("offer created:", offer);
     peerConnection?.setLocalDescription(offer);
     window.socket.emit("newOffer", offer);
@@ -32,18 +33,16 @@ export async function intiiateCall() {
 export async function answerOffer(offerObj: any) {
   await createPeerConnection();
   await peerConnection?.setRemoteDescription(offerObj)
+  isRemoteDescSet = true;
   const answer = await peerConnection!.createAnswer({});
+  console.log("answer:", answer);
   await peerConnection?.setLocalDescription(answer);
-  console.log(answer);
-  const offerIceCandidate = await window.socket.emitWithAck("newAnswer", answer);
-  offerIceCandidate.forEach((candidate: any) => {
-    peerConnection?.addIceCandidate(candidate);
-    console.log("added ice candidate");
-  });
+  window.socket.emit("newAnswer", answer);
 }
 
 export async function addAnswer(answer: any) {
   await peerConnection?.setRemoteDescription(answer);
+  isRemoteDescSet = true;
 }
 
 async function createPeerConnection() {
@@ -96,13 +95,26 @@ async function createPeerConnection() {
 
 export function addNewIceCandidates(iceCandidates: RTCIceCandidate[]) {
   for (const candidate of iceCandidates) {
-    peerConnection?.addIceCandidate(candidate);
-    console.log("Adding Ice Candidate");
+    (async() => {
+      const intervalId = window.setInterval(() => {
+        if (peerConnection?.remoteDescription) {
+          peerConnection?.addIceCandidate(candidate).then(() => {
+            console.log("adding ice candidate")
+          }).catch((error) => {
+            console.error("error adding ice candidate:", error);
+          });
+          window.clearInterval(intervalId);
+        }
+      }, 500);
+      // end async
+    })();
   }
 }
 
 export function sessionStopped() {
+  peerConnection?.close();
   peerConnection = null;
+  remoteStream?.getTracks().forEach((track) => track.stop());
   remoteStream = null;
-  localStream = null;
+  isRemoteDescSet = false;
 }

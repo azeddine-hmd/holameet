@@ -25,9 +25,10 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
   const skipSession = () => {
+    console.log("skipping");
     window.socket.emit("skip");
     Rtc.sessionStopped();
-    setRemoteStream(null);
+    setRemoteStream(Rtc.remoteStream);
   };
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const onSessionStopped = (...args: any[]) => {
     console.log("session stopped!", ...args);
     Rtc.sessionStopped();
+    setRemoteStream(Rtc.remoteStream)
     setTimeout(() => window.socket.emit("start"), 1_000);
   };
 
@@ -66,9 +68,9 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   };
 
   const onRecieveIceCandidates = (...args: any[]) => {
-    const iceCandidates: RTCIceCandidate[] = args[0];
-    console.log("args:", args[0]);
-    Rtc.addNewIceCandidates(iceCandidates);
+    const iceCandidates: RTCIceCandidate = args[0];
+    console.log("iceCandidates:", args[0]);
+    Rtc.addNewIceCandidates([iceCandidates]);
   };
 
   useEffect(() => {
@@ -130,7 +132,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
             <div className="flex h-full gap-4 items-end">
 
               <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
-                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={localStream} {...bind()} />
+                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={localStream} {...bind()} muted />
               </animated.div>
 
               <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
