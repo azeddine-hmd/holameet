@@ -13,7 +13,7 @@ services:
     # volumes:
     #   - ./backend:/usr/src/app
     environment:
-      - PORT=${BACKEND_PORT}
+      - PORT=${PORT}
       - NODE_ENV=${NODE_ENV}
       - BACKEND_PROTOCOL=${BACKEND_PROTOCOL}
       - BACKEND_HOST=${BACKEND_HOST}
