@@ -6,7 +6,7 @@ import io from "socket.io-client";
 export default function GlobalTemplate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
-    window.socket = io(process.env.NODE_ENV === "development" ? "https://localhost:3001" : process.env.NEXT_PUBLIC_BACKEND_DOMAIN as string, {
+    window.socket = io(process.env.NEXT_PUBLIC_BACKEND_DOMAIN as string, {
       transports: ["websocket"],
       withCredentials: true,
     })
