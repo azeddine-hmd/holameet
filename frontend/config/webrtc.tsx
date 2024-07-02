@@ -1,29 +1,6 @@
-const peerConfig: RTCConfiguration = {
-  iceServers: [
-    {
-      urls: [
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-      ]
-    }
-  ]
-};
-
 export let localStream: MediaStream | null = null;
 export let remoteStream: MediaStream | null = null;
-export let peerConnection: RTCPeerConnection | null = null;
-
-export function setlocalStream(stream: MediaStream | null) {
-  localStream = stream;
-}
-
-export function setRemoteStream(stream: MediaStream | null) {
-  remoteStream = null;
-}
-
-export function setPeerConnection(peerConnection: RTCPeerConnection | null) {
-  peerConnection = peerConnection;
-}
+let peerConnection: RTCPeerConnection | null = null;
 
 export async function startLocalStream() {
   try {
@@ -53,7 +30,8 @@ export async function intiiateCall() {
 }
 
 export async function answerOffer(offerObj: any) {
-  await createPeerConnection(offerObj);
+  await createPeerConnection();
+  await peerConnection?.setRemoteDescription(offerObj)
   const answer = await peerConnection!.createAnswer({});
   await peerConnection?.setLocalDescription(answer);
   console.log(answer);
@@ -68,8 +46,18 @@ export async function addAnswer(answer: any) {
   await peerConnection?.setRemoteDescription(answer);
 }
 
-async function createPeerConnection(offerObj?: any) {
-  peerConnection = new RTCPeerConnection(peerConfig);
+async function createPeerConnection() {
+  peerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+        ],
+      }
+    ]
+  }
+  );
   remoteStream = new MediaStream();
 
   if (!localStream) {
@@ -88,9 +76,9 @@ async function createPeerConnection(offerObj?: any) {
     // console.log("Ice candidate found!");
     // console.log("e:", e);
     if (e.candidate) {
-      window.socket.emit("send icecandidate", {
-        iceCandidate: e.candidate,
-      })
+        window.socket.emit("send icecandidate", {
+          iceCandidate: e.candidate,
+        })
     } else {
       console.error("no icecandidate been found!");
     }
@@ -104,14 +92,17 @@ async function createPeerConnection(offerObj?: any) {
       console.log("adding track to remote stream object");
     });
   });
+}
 
-  if (offerObj) {
-    console.log("offerObj: (check missing required 'type' member of RTCSessionDescriptionInit)", offerObj);
-    await peerConnection.setRemoteDescription(offerObj)
+export function addNewIceCandidates(iceCandidates: RTCIceCandidate[]) {
+  for (const candidate of iceCandidates) {
+    peerConnection?.addIceCandidate(candidate);
+    console.log("Adding Ice Candidate");
   }
 }
 
-export function addNewIceCandidate(iceCandidate: RTCIceCandidate) {
-  peerConnection?.addIceCandidate(iceCandidate);
-  console.log("Adding Ice Candidate");
+export function sessionStopped() {
+  peerConnection = null;
+  remoteStream = null;
+  localStream = null;
 }

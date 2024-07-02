@@ -26,8 +26,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
   const skipSession = () => {
     window.socket.emit("skip");
-    Rtc.setRemoteStream(null);
-    Rtc.setPeerConnection(null);
+    Rtc.sessionStopped();
     setRemoteStream(null);
   };
 
@@ -48,9 +47,8 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
   const onSessionStopped = (...args: any[]) => {
     console.log("session stopped!", ...args);
+    Rtc.sessionStopped();
     setTimeout(() => window.socket.emit("start"), 1_000);
-    Rtc.setRemoteStream(null);
-    setRemoteStream(null);
   };
 
   const onNewOfferAwaiting = (...args: any[]) => {
@@ -67,9 +65,10 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
     Rtc.addAnswer(answer); 
   };
 
-  const onRecieveIceCandidate = (...args: any[]) => {
-    const iceCandidate: RTCIceCandidate = args[0];
-    Rtc.addNewIceCandidate(iceCandidate);
+  const onRecieveIceCandidates = (...args: any[]) => {
+    const iceCandidates: RTCIceCandidate[] = args[0];
+    console.log("args:", args[0]);
+    Rtc.addNewIceCandidates(iceCandidates);
   };
 
   useEffect(() => {
@@ -88,7 +87,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
         onAnswerResponse(...args);
       });
       window.socket.on("receive icecandidate", (...args: any[]) => {
-        onRecieveIceCandidate(...args);
+        onRecieveIceCandidates(...args);
       });
     };
     if (window.socket != null) {

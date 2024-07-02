@@ -37,9 +37,9 @@ interface Session {
   id2: string;
   rtcInfo?: {
     offer: any;
-    offerIceCandidates: any[];
+    offererIceCandidates: any[];
     answer?: any;
-    answererIceCandidate: any[];
+    answererIceCandidates: any[];
   };
 }
 
@@ -138,9 +138,9 @@ io.on('connection', (socket: Socket) => {
     }
     session.rtcInfo = {
       offer: newOffer,
-      offerIceCandidates: [],
+      offererIceCandidates: [],
       answer: null,
-      answererIceCandidate: [],
+      answererIceCandidates: [],
     };
     const [socket1, socket2] = getSessionSockets(session);
     if (!socket1 || !socket2) {
@@ -149,7 +149,7 @@ io.on('connection', (socket: Socket) => {
     socket2.emit('newOfferAwaiting', newOffer);
   });
 
-  socket.on('newAnswer', (newAnswer: any, ackFn: (...args: any[]) => void) => {
+  socket.on('newAnswer', (newAnswer: any) => {
     console.info('[EVENT]: recieved a new answer, socket.id:', socket.id);
     const session = getCurrentSession(socket.id);
     if (!session) {
@@ -163,9 +163,12 @@ io.on('connection', (socket: Socket) => {
     if (!socket1 || !socket2) {
       return;
     }
-    ackFn(session.rtcInfo?.offerIceCandidates);
     session.rtcInfo!.answer = newAnswer;
     socket1.emit('answerResponse', newAnswer);
+
+    // send ice candidates to both clients 
+    socket1.emit('receive icecandidate', session.rtcInfo?.answererIceCandidates);
+    socket2.emit('receive icecandidate', session.rtcInfo?.offererIceCandidates);
   })
 
   socket.on('send icecandidate', (...args: any[]) => {
@@ -184,15 +187,32 @@ io.on('connection', (socket: Socket) => {
     if (session.id1 === socket.id) {
       // we are offerer
       assert(session.rtcInfo != undefined);
-      session.rtcInfo?.offerIceCandidates.push(iceCandidate);
-      socket2.emit("receive icecandidate", iceCandidate);
+      session.rtcInfo?.offererIceCandidates.push(iceCandidate);
+      // socket2.emit("receive icecandidate", iceCandidate);
     } else {
       // we are answerer
       assert(session.rtcInfo != undefined);
-      session.rtcInfo?.answererIceCandidate.push(iceCandidate);
-      socket1.emit("receive icecandidate", iceCandidate);
+      session.rtcInfo?.answererIceCandidates.push(iceCandidate);
+      // socket1.emit("receive icecandidate", iceCandidate);
     }
   })
+
+  // socket.on("get icecandidate", (ackFn: (...args: any[]) => void) => {
+  //   const session = getCurrentSession(socket.id);
+  //   if (!session) {
+  //     socket.emit('error', 'no active session found');
+  //     return;
+  //   }
+  //   if (session.id1 === socket.id) {
+  //     // we are offerer
+  //     assert(session.rtcInfo != undefined);
+  //     ackFn(session.rtcInfo?.answererIceCandidates);
+  //   } else {
+  //     // we are answerer
+  //     assert(session.rtcInfo != undefined);
+  //     ackFn(session.rtcInfo?.offererIceCandidates);
+  //   }
+  // });
 });
 
 function removeSession(socketId: string): Session | null {
