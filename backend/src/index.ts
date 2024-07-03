@@ -65,14 +65,20 @@ io.on('connection', (socket: Socket) => {
     }
     if (q1 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q1 });
-      if (socket2)
+      if (socket2) {
         startSession(socket1!, socket2!);
-      q1 = null;
+        q1 = null;
+      } else {
+        q1 = socket.id;
+      }
     } else if (q2 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: socket.id, id2: q2 });
-      if (socket2)
+      if (socket2) {
         startSession(socket1!, socket2!);
-      q2 = null;
+        q2 = null;
+      } else {
+        q2 = socket.id;
+      }
     } else {
       console.log('[SERVER]: id:', socket.id, ' is set to q1');
       q1 = socket.id;
