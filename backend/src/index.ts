@@ -261,6 +261,8 @@ function startSession(socket1: Socket, socket2: Socket) {
   console.info(
     `[SESSION]: starting session for ${socket1.id} and ${socket2.id}`
   );
+  if (!socket1 || !socket2)
+    return;
   activeSessions.push({ id1: socket1.id, id2: socket2.id });
   socket1.emit('session started', 'sending message to client 1');
   // socket2.emit('session started', 'sending message to client 2');
