@@ -105,8 +105,11 @@ io.on('connection', (socket: Socket) => {
     // finding session for person who fires skip event
     if (q1 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: session!.id1, id2: q1 });
-      startSession(socket1!, socket2!);
-      q1 = null;
+      if (socket2) {
+        startSession(socket1!, socket2!);
+        q1 = null;
+      }
+      q1 = session!.id1;
     } else {
       console.log('[SERVER]: id:', session!.id1, ' is set to q1');
       q1 = session!.id1;
@@ -115,8 +118,11 @@ io.on('connection', (socket: Socket) => {
     // finding session for other person who been skiped on
     if (q2 != null) {
       const [socket1, socket2] = getSessionSockets({ id1: session!.id2, id2: q2 });
-      startSession(socket1!, socket2!);
-      q2 = null;
+      if (socket2) {
+        startSession(socket1!, socket2!);
+        q2 = null;
+      }
+      q2 = session!.id2;
     } else {
       console.log('[SERVER]: id:', session!.id2, ' is set to q2');
       q2 = session!.id2;
