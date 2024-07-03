@@ -94,9 +94,12 @@ io.on('connection', (socket: Socket) => {
       console.log('You\'re not in session for a skip. ignoring...');
       return;
     }
-    const [_, socket2] = getSessionSockets(session);
-    if (session.id1 === socket.id) {
+    // telling other person that he has been skipped on
+    const [socket1, socket2] = getSessionSockets(session);
+    if (socket1?.id === socket.id) {
       socket2?.emit("stop session");
+    } else {
+      socket1?.emit("stop session");
     }
 
     // finding session for person who fires skip event
@@ -118,6 +121,7 @@ io.on('connection', (socket: Socket) => {
       console.log('[SERVER]: id:', session!.id2, ' is set to q2');
       q2 = session!.id2;
     }
+
   });
 
   socket.on('disconnect', () => {
