@@ -3,16 +3,23 @@ import dotenv from 'dotenv';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 import { assert } from 'console';
 
-dotenv.config();
+if (process.env.NODE_ENV === "development")
+  dotenv.config();
 
 const app = express();
-const server = https.createServer({ 
-  key: process.env.NODE_ENV === "development" ? fs.readFileSync('cert.key') : undefined,
-  cert: process.env.NODE_ENV === "development" ? fs.readFileSync('cert.crt'): undefined,
-}, app);
+let server: https.Server | http.Server | null = null;
+if (process.env.NODE_ENV === "development") {
+  server = https.createServer({ 
+    key: fs.readFileSync('cert.key'),
+    cert: fs.readFileSync('cert.crt'),
+  }, app);
+} else {
+  server = http.createServer(app);
+}
 
 const corsOpts: cors.CorsOptions = {
   origin: '*',
