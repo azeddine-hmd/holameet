@@ -277,6 +277,7 @@ function getSessionSockets(session: Session): [Socket | null, Socket | null] {
 }
 
 function startSession(socket1: Socket, socket2: Socket) {
+  // just hiding the bug until later for more deep debugging
   if (!socket1 || !socket2)
     return;
   console.info(
