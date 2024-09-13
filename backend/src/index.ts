@@ -244,6 +244,27 @@ io.on('connection', (socket: Socket) => {
   //     ackFn(session.rtcInfo?.offererIceCandidates);
   //   }
   // });
+
+  socket.on("sendMessage", (newMsg: string) => {
+    console.info('[EVENT]: sending new message, socket.id:', socket.id);
+    const session = getCurrentSession(socket.id);
+    if (!session) {
+      socket.emit('error', 'no active session found');
+      return;
+    }
+    const [socket1, socket2] = getSessionSockets(session);
+    if (!socket1 || !socket2) {
+      return;
+    }
+    console.log("newMsg", newMsg);
+    if (socket1.id == socket.id) {
+      socket1.emit("receiveMessage", { text: newMsg, sender: "ME", time: new Date().toISOString() });
+      socket2.emit("receiveMessage", { text: newMsg, sender: "OTHER", time: new Date().toISOString() });
+    } else {
+      socket1.emit("receiveMessage", { text: newMsg, sender: "OTHER", time: new Date().toISOString() });
+      socket2.emit("receiveMessage", { text: newMsg, sender: "ME", time: new Date().toISOString() });
+    }
+  });
 });
 
 function removeSession(socketId: string): Session | null {

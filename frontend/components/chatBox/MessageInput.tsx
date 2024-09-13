@@ -8,7 +8,8 @@ function MessageInput({ onSend }: { onSend: (text: string) => void }) {
 
   const sendMessage = () => {
     if (text.trim()) {
-      onSend(text);
+      console.log("text.trim():", text.trim());
+      onSend(text.trim());
       setText('');
     }
   };
@@ -18,20 +19,15 @@ function MessageInput({ onSend }: { onSend: (text: string) => void }) {
       <Textarea
         placeholder="Type your message..."
         value={text}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => { setText(e.target.value) }}
+        onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
-          console.log("key:", e.key);
           if (!e.shiftKey && e.key === "Enter" && text.trim() !== "") {
             e.preventDefault();
             sendMessage();
           } else if (e.shiftKey && e.key === "Enter") {
             e.preventDefault();
-            console.log("Shift + Enter condition");
             setText(text + "\n");
           } 
-        }}
-        onKeyUp={(e) => {
-
         }}
         className="flex-1 rounded-2xl border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white h-10 resize-none"
       />

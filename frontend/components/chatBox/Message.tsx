@@ -3,7 +3,7 @@ import React from 'react';
 import { text } from 'stream/consumers';
 
 const Message = ({ text, sender, time }: { text: string; sender: string; time: string }) => {
-  const isEmitter = sender === 'YO';
+  const isEmitter = sender === 'ME';
 
   return (
     <div className={`flex items-end gap-3 ${isEmitter ? 'justify-end' : ''}`}>
