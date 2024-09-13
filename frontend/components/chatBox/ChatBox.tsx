@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MessageList from '@/components/chatBox/MessageList';
 import MessageInput from '@/components/chatBox/MessageInput';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,12 @@ function ChatBox({ className, ...restProps }: ChatBoxProps) {
       newMsg.time = format(newMsg.time, "h:mm a");
       setMessages((prevMessages) => [...prevMessages, newMsg]);
   });
+
+  useEffect(() => {
+    document.addEventListener("session stopped", () => {
+      setMessages([]);
+    });
+  }, []);
 
   return (
     <div className={cn("flex flex-col h-full w-full bg-white dark:bg-gray-950 rounded-2xl shadow-lg overflow-hidden", className)} {...restProps}>

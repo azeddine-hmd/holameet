@@ -29,6 +29,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
     window.socket.emit("skip");
     Rtc.sessionStopped();
     setRemoteStream(Rtc.remoteStream);
+    document.dispatchEvent(new CustomEvent("session stopped"));
   };
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
     Rtc.sessionStopped();
     setRemoteStream(Rtc.remoteStream)
     setTimeout(() => window.socket.emit("start"), 1_000);
+    document.dispatchEvent(new CustomEvent("session stopped"));
   };
 
   const onNewOfferAwaiting = (...args: any[]) => {
