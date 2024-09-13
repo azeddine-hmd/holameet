@@ -44,6 +44,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
         setLocalStream(Rtc.localStream);
         setRemoteStream(Rtc.remoteStream);
       });
+      document.dispatchEvent(new CustomEvent("session started"));
     }, 1_000);
   };
 
@@ -73,6 +74,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
     const iceCandidates: RTCIceCandidate = args[0];
     console.log("iceCandidates:", args[0]);
     Rtc.addNewIceCandidates([iceCandidates]);
+    document.dispatchEvent(new CustomEvent("session started"));
   };
 
   useEffect(() => {
