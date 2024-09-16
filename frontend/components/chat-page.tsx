@@ -2,8 +2,6 @@
 
 import ChatBox from "./chatBox/ChatBox";
 import VideoCallPanel from "./video-call-panel";
-import { useEffect } from "react";
-// import { callPeer } from "../config/webrtc";
 
 export default function ChatPage() {
 

@@ -48,7 +48,7 @@ function ChatBox({ className, ...restProps }: ChatBoxProps) {
         </div>
       }
       <MessageList messages={messages} />
-      <MessageInput onSend={handleSend} />
+      <MessageInput disabled={!onSession} onSend={handleSend} />
     </div>
   );
 };
