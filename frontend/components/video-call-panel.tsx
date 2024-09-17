@@ -12,6 +12,7 @@ import SkipIcon from '@/components/icons/SkipIcon';
 import { useDrag } from '@use-gesture/react';
 import { animated, useSpring } from "@react-spring/web";
 import * as Rtc from "@/config/webrtc";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
 
 export type VideoCallPanel = React.ComponentProps<"div">;
 
@@ -23,6 +24,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const [isControlsOpen, setControlsOpen] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const { isMd } = useBreakpoint("md");
 
   const skipSession = () => {
     console.log("skipping");
@@ -67,7 +69,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
   const onAnswerResponse = (...args: any[]) => {
     const answer = args[0];
     console.log("[SOCKET]: answer response...", answer);
-    Rtc.addAnswer(answer); 
+    Rtc.addAnswer(answer);
   };
 
   const onRecieveIceCandidates = (...args: any[]) => {
@@ -108,65 +110,72 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
 
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
-  const bind = useDrag(({ down, movement: [mx, my], xy, axis, values}) => {
+  const bind = useDrag(({ down, movement: [mx, my], xy, axis, values }) => {
     api.start({ x: down ? mx : 0, y: down ? my : 0, immediate: down });
   });
 
   return (
     <div
       ref={ref}
-      className={cn("w-full h-full relative", className)}
+      className={cn("w-full h-full relative flex flex-col md:flex-none min-h-0", className)}
       onMouseEnter={() => setHideCallControl(false)}
       onMouseLeave={() => setHideCallControl(true)}
       {...restProps}
     >
-      <VideoCallCard stream={remoteStream} />
+      <VideoCallCard wrapperClassName="h-full w-full flex-1" stream={remoteStream} />
       <Logo className="absolute left-4 top-4" />
-      <div className="absolute bottom-0 left-0 h-0 w-0">
-        <Popover open={isControlsOpen}>
-          <PopoverTrigger>
-            <div className="hidden"></div>
-          </PopoverTrigger>
-          <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0"
-            sideOffset={0}
-            style={{
-              width: width!,
-            }}
-          >
-            <div className="flex h-full gap-4 items-end">
+      {
+        isMd ? (
+          <div className="absolute bottom-0 left-0 h-0 w-0">
+            <Popover open={isControlsOpen}>
+              <PopoverTrigger>
+                <div className="hidden"></div>
+              </PopoverTrigger>
+              <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0"
+                sideOffset={0}
+                style={{
+                  width: width!,
+                }}
+              >
+                <div className="flex h-full gap-4 items-end">
 
-              <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
-                <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={localStream} {...bind()} muted />
-              </animated.div>
+                  <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
+                    <VideoCallCard wrapperClassName="w-[300px] min-h-[222px] rounded-md border-2 border-border" stream={localStream} {...bind()} muted />
+                  </animated.div>
 
-              <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
-                <div className="flex justify-center items-center h-full space-x-2">
+                  <div className={cn("flex-grow h-full group-hover:bg-red-500", { "hidden": hideCallControl })}>
+                    <div className="flex justify-center items-center h-full space-x-2">
 
 
-                  <Button className="!outline-none rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setMicMute(!isMicMute)}>
-                    <BsMic size="24" className={cn("absolute left-50 top-50", { "text-destructive": isMicMute })} />
-                    {isMicMute &&
-                      <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
-                    }
-                  </Button>
-                  <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 hover:text-white bg-white/20 hover:bg-white/30 text-white" onClick={() => skipSession()}>
-                    <SkipIcon />
-                    <span className="ml-1 bold">
-                      SKIP
-                    </span>
-                  </Button>
-                  <Button className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setHeadsetMute(!isHeadsetMute)}>
-                    <BsHeadset size="24" className={cn("absolute left-50 top-50", { "text-destructive": isHeadsetMute })} />
-                    {isHeadsetMute &&
-                      <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
-                    }
-                  </Button>
+                      <Button className="!outline-none rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setMicMute(!isMicMute)}>
+                        <BsMic size="24" className={cn("absolute left-50 top-50", { "text-destructive": isMicMute })} />
+                        {isMicMute &&
+                          <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
+                        }
+                      </Button>
+                      <Button size="icon" variant="ghost" className="rounded-full w-24 h-14 hover:text-white bg-white/20 hover:bg-white/30 text-white" onClick={() => skipSession()}>
+                        <SkipIcon />
+                        <span className="ml-1 bold">
+                          SKIP
+                        </span>
+                      </Button>
+                      <Button className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white" onClick={() => setHeadsetMute(!isHeadsetMute)}>
+                        <BsHeadset size="24" className={cn("absolute left-50 top-50", { "text-destructive": isHeadsetMute })} />
+                        {isHeadsetMute &&
+                          <span className="absolute w-[34px] h-1 bg-red-500 z-50 rounded-lg rotate-[140deg]"></span>
+                        }
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-    </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        )
+          : (
+            <VideoCallCard wrapperClassName="h-full w-full flex-1" stream={localStream} {...bind()} muted />
+          )
+      }
+    </div >
   );
 }
