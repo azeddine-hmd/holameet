@@ -108,6 +108,18 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    if (isMicMute && localStream?.active) {
+      localStream.getAudioTracks().forEach((track) => {
+        track.enabled = false;
+      });
+    } else if (!isMicMute && localStream?.active) {
+      localStream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+    }
+  }, [isMicMute]);
+
   const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }));
 
   const bind = useDrag(({ down, movement: [mx, my], xy, axis, values }) => {
@@ -122,7 +134,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
       onMouseLeave={() => setHideCallControl(true)}
       {...restProps}
     >
-      <VideoCallCard wrapperClassName="h-full w-full flex-1" stream={remoteStream} />
+      <VideoCallCard className="object-fill md:object-contain h-full w-full" wrapperClassName="h-full w-full flex-1" stream={remoteStream} muted={isHeadsetMute} />
       <Logo className="absolute left-4 top-4" />
       {
         isMd ? (
@@ -131,7 +143,7 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
               <PopoverTrigger>
                 <div className="hidden"></div>
               </PopoverTrigger>
-              <PopoverContent className="right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0"
+              <PopoverContent className=" right-0 left-0 p-2 m-0 mb-8 h-fit bg-transparent outline-0  shadow-none border-0"
                 sideOffset={0}
                 style={{
                   width: width!,
@@ -173,7 +185,25 @@ export default function VideoCallPanel({ className, ...restProps }: VideoCallPan
           </div>
         )
           : (
-            <VideoCallCard wrapperClassName="h-full w-full flex-1" stream={localStream} {...bind()} muted />
+          <div className="absolute top-[100px] h-0 w-0">
+            <Popover open={true}>
+              <PopoverTrigger>
+                <div className="hidden"></div>
+              </PopoverTrigger>
+              <PopoverContent className="w-full pr-10 m-0 mb-8 h-fit flex justify-end  bg-transparent outline-0  shadow-none border-0"
+                sideOffset={0}
+                style={{
+                  width: width!,
+                }}
+              >
+                <div className="flex gap-4 items-end w-32 h-[350px] overflow-hidden">
+                  <animated.div className="flex-shrink-0 z-10" style={{ x, y }} {...bind()}>
+                    <VideoCallCard className="object-fit" wrapperClassName="  rounded-md border-2 border-border" stream={localStream} {...bind()} muted />
+                  </animated.div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            </div>
           )
       }
     </div >
