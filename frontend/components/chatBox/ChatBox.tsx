@@ -1,28 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MessageList from '@/components/chatBox/MessageList';
 import MessageInput from '@/components/chatBox/MessageInput';
 import { cn } from '@/lib/utils';
+import { useEvent } from '@/hooks/use-event';
+import { format } from 'date-fns';
 
 export type ChatBoxProps = React.ComponentProps<"div">;
 
+export type ChatContent = {
+  text: string;
+  sender: string;
+  time: string;
+};
+
 function ChatBox({ className, ...restProps }: ChatBoxProps) {
-  const [messages, setMessages] = useState([
-    { text: "Hey there! How's it going?", sender: 'JD', time: '10:30 AM' },
-    { text: "I'm doing great, thanks for asking!", sender: 'YO', time: '10:31 AM' },
-    { text: "That's great to hear! I'm free this weekend, would you like to grab coffee?", sender: 'JD', time: '10:32 AM' },
-    { text: "Sounds good, let's do it! Where should we meet?", sender: 'YO', time: '10:33 AM' },
-  ]);
+  const [messages, setMessages] = useState<ChatContent[]>([]);
+  const [onSession, setOnSession] = useState(false);
 
   const handleSend = (text: string) => {
-    setMessages([...messages, { text, sender: 'YO', time: new Date().toLocaleTimeString() }]);
+    console.log("sending new message:", text);
+    window.socket.emit("sendMessage", text);
   };
+
+  useEvent("receiveMessage", (newMsg: ChatContent) => {
+      console.log("receive a new message: ", newMsg);
+      newMsg.time = format(newMsg.time, "h:mm a");
+      setMessages((prevMessages) => [...prevMessages, newMsg]);
+  });
+
+  useEffect(() => {
+    document.addEventListener("session stopped", () => {
+      setMessages([]);
+      setOnSession(false);
+    });
+    document.addEventListener("session started", () => {
+      setOnSession(true);
+    });
+  }, []);
 
   return (
     <div className={cn("flex flex-col h-full w-full bg-white dark:bg-gray-950 rounded-2xl shadow-lg overflow-hidden", className)} {...restProps}>
+      {!onSession &&
+        <div className="rounded-none mx-auto mt-4 text-center text-black/60">
+          looking for someone to chat...
+        </div>
+      }
       <MessageList messages={messages} />
-      <MessageInput onSend={handleSend} />
+      <MessageInput disabled={!onSession} onSend={handleSend} />
     </div>
   );
 };

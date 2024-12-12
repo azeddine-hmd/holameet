@@ -3,12 +3,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import SendIcon from '@/components/icons/SendIcon';
 
-function MessageInput({ onSend }: { onSend: (text: string) => void }) {
+function MessageInput({ onSend, disabled, ...restProps }: { onSend: (text: string) => void } & React.ComponentProps<"textarea">) {
   const [text, setText] = useState('');
 
   const sendMessage = () => {
     if (text.trim()) {
-      onSend(text);
+      onSend(text.trim());
       setText('');
     }
   };
@@ -16,26 +16,26 @@ function MessageInput({ onSend }: { onSend: (text: string) => void }) {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 flex items-center gap-2">
       <Textarea
+        className="flex-1 rounded-2xl border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white h-10 resize-none"
         placeholder="Type your message..."
         value={text}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => { setText(e.target.value) }}
+        onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
-          console.log("key:", e.key);
           if (!e.shiftKey && e.key === "Enter" && text.trim() !== "") {
             e.preventDefault();
             sendMessage();
           } else if (e.shiftKey && e.key === "Enter") {
             e.preventDefault();
-            console.log("Shift + Enter condition");
             setText(text + "\n");
-          } 
+          }
         }}
-        onKeyUp={(e) => {
-
-        }}
-        className="flex-1 rounded-2xl border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white h-10 resize-none"
+        disabled={disabled}
+        {...restProps}
       />
-      <Button onClick={sendMessage} className="bg-orange-500 hover:bg-orange-600 text-white h-10">
+      <Button
+        className="bg-orange-500 hover:bg-orange-600 text-white h-10"
+        onClick={sendMessage}
+        disabled={disabled} >
         <SendIcon className="w-5 h-5" />
       </Button>
     </div>
